@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Interview Tracker</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: linear-gradient(to right, #232526, #414345);
+            color: white;
+            transition: background 0.5s, color 0.5s;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            padding: 20px;
+        }
+        .candidate {
+            padding: 15px;
+            margin: 10px;
+            background: white;
+            color: black;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(255,255,255,0.3);
+            position: relative;
+            transition: transform 0.3s;
+        }
+        .candidate:hover {
+            transform: scale(1.05);
+        }
+        .stage {
+            font-size: 0.9rem;
+            color: #555;
+        }
+        button {
+            margin: 5px;
+            padding: 8px 12px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s;
+        }
+        .remove { background: red; color: white; }
+        .next-stage { background: green; color: white; }
+        .details { display: none; }
+        .dark-mode { background: #f4f4f4; color: black; }
+        #toggleTheme { position: absolute; top: 10px; right: 10px; background: yellow; color: black; }
+    </style>
+</head>
+<body>
+    <button id="toggleTheme">🌙 Switch Theme</button>
+    <div class="container">
+        <h2>Employee Interview Tracker</h2>
+        <input type="text" id="candidateName" placeholder="Enter Candidate Name">
+        <button id="addCandidate">➕ Add Candidate</button>
+        <div id="candidatesList"></div>
+    </div>
+    <script>
+        $(document).ready(function(){
+            let darkMode = false;
+            $("#toggleTheme").click(function(){
+                darkMode = !darkMode;
+                $("body").toggleClass("dark-mode");
+            });
+            
+            $("#addCandidate").click(function(){
+                let name = $("#candidateName").val().trim();
+                if (name === "") { alert("Please enter a candidate name"); return; }
+                
+                let candidate = `<div class='candidate' data-stage='Applied'>
+                    <h3>${name}</h3>
+                    <p class='stage'>Stage: Applied</p>
+                    <button class='toggleDetails'>📋 Details</button>
+                    <button class='next-stage'>➡️ Next Stage</button>
+                    <button class='remove'>❌ Remove</button>
+                    <div class='details'><p>Interview details will appear here.</p></div>
+                </div>`;
+                
+                $("#candidatesList").append(candidate).children(':last').hide().fadeIn(1000);
+                $("#candidateName").val("");
+            });
+            
+            $(document).on("click", ".toggleDetails", function(){
+                $(this).siblings(".details").slideToggle();
+            });
+            
+            $(document).on("click", ".next-stage", function(){
+                let stages = ["Applied", "Screening", "Technical", "Hired"];
+                let parent = $(this).closest(".candidate");
+                let currentStage = parent.attr("data-stage");
+                let nextIndex = stages.indexOf(currentStage) + 1;
+                
+                if (nextIndex < stages.length) {
+                    parent.attr("data-stage", stages[nextIndex]);
+                    parent.find(".stage").text("Stage: " + stages[nextIndex]).effect("highlight", {color: '#ffff99'}, 1000);
+                } else {
+                    $(this).fadeOut();
+                }
+            });
+            
+            $(document).on("click", ".remove", function(){
+                $(this).closest(".candidate").fadeOut(1000, function(){ $(this).remove(); });
+            });
+        });
+    </script>
+</body>
+</html>
